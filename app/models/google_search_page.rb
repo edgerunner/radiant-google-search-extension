@@ -1,5 +1,5 @@
 class GoogleSearchPage < Page
-  #TODO: Put description
+  description 'A page to display search results obtained through the Google API'
   
   #TODO: Implement search page tags
   
