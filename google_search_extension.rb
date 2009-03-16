@@ -4,6 +4,7 @@ class GoogleSearchExtension < Radiant::Extension
   url "http://github.com/edgerunner/radiant-google-search-extension"
   
   def activate
+    Page.send :include, GoogleSearchTags
   end
   
   def deactivate
