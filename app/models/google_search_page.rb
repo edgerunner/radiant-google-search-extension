@@ -1,7 +1,11 @@
 class GoogleSearchPage < Page
-  attr_reader :query, :start, :gsearch
   
   description 'A page to display search results obtained through the Google API'
+  
+  desc 'Renders the passed query string'
+  tag 'gsearch:query' do |tag|
+    query
+  end
   
   desc 'Renders its contents when there is no search executed yet'
   tag 'gsearch:clean' do |tag|
@@ -30,31 +34,33 @@ class GoogleSearchPage < Page
     output = ""
     gsearch.response_data.results.each do |result|
       tag.locals.result = result
-      output << result.title + ' - '
+      output << tag.expand
     end
     output
   end
   
-  [:title_no_formatting, :content, :visible_url, :url, :title, :gsearch_result_class, :unescaped_url,:cache_url].each do |sym|
-    desc "Renders the #{sym.to_s.humanize} of the current result"
-    tag "gsearch:results:each:#{sym.to_s}" do |tag|
+  %w[title_no_formatting content visible_url url title unescaped_url cache_url].each do |sym|
+    desc "Renders the <strong>#{sym.humanize}</strong> of the current result"
+    tag "gsearch:results:each:#{sym}" do |tag|
       tag.locals.result.send sym
     end
   end
+
   
-  def process(request,response)
-    if @query = request.parameters['q']
-      @start = request.parameters['start'] || '0'
-      @gsearch = GoogleSearch.new @query, @start
-      puts "Found #{@gsearch.response_data.results.count} results for #{@query}"
-    end
-    super
-    puts 'Processing complete'
+  def query
+    @request.parameters['q']
+  end
+  def start
+    @request.parameters['start'] || 0
   end
   
+  def gsearch
+    return unless query
+    @gsearch ||= GoogleSearch.new query, start
+  end
+ 
   def cache?
     false
   end
-  
 end
 
