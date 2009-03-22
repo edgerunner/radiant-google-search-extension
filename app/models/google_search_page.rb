@@ -62,5 +62,6 @@ class GoogleSearchPage < Page
   def cache?
     false
   end
+
 end
 
