@@ -58,6 +58,22 @@ class GoogleSearchPage < Page
     tag.expand
   end
   
+  desc 'Sets the context to the next page'
+  tag "gsearch:pages:next" do |tag|
+    page_index = gsearch.response_data.cursor.current_page_index.to_i + 1
+    page_index = gsearch.response_data.cursor.pages.count if page_index > gsearch.response_data.cursor.pages.count
+    tag.locals.gpage = gsearch.response_data.cursor.pages[page_index]
+    tag.expand
+  end
+  
+  desc 'Sets the context to the previous page'
+  tag "gsearch:pages:prev" do |tag|
+    page_index = gsearch.response_data.cursor.current_page_index.to_i - 1
+    page_index = 0 if page_index < 0
+    tag.locals.gpage = gsearch.response_data.cursor.pages[page_index]
+    tag.expand
+  end
+  
   desc 'Sets the context to the first page'
   tag "gsearch:pages:first" do |tag|
     tag.locals.gpage = gsearch.response_data.cursor.pages.first
