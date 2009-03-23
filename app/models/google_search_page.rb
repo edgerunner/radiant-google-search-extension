@@ -29,6 +29,11 @@ class GoogleSearchPage < Page
     tag.expand if gsearch and gsearch.response_data.results.count > 0
   end
   
+  desc 'Renders the estimated result count'
+  tag 'gsearch:results:count' do |tag|
+    gsearch.response_data.cursor.estimated_result_count
+  end
+  
   desc 'Sets the context for each result in the set'
   tag 'gsearch:results:each' do |tag|
     output = ""
