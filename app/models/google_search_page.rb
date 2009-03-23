@@ -45,6 +45,54 @@ class GoogleSearchPage < Page
       tag.locals.result.send sym
     end
   end
+  
+  desc 'Sets the context to the current page'
+  tag "gsearch:pages:current" do |tag|
+    page_index = gsearch.response_data.cursor.current_page_index.to_i
+    tag.locals.gpage = gsearch.response_data.cursor.pages[page_index]
+    tag.expand
+  end
+  
+  desc 'Sets the context to the first page'
+  tag "gsearch:pages:first" do |tag|
+    tag.locals.gpage = gsearch.response_data.cursor.pages.first
+    tag.expand
+  end
+  
+  desc 'Sets the context to the last page'
+  tag "gsearch:pages:last" do |tag|
+    tag.locals.gpage = gsearch.response_data.cursor.pages.last
+    tag.expand
+  end
+  
+  desc 'Renders its contents when there is only a single page'
+  tag "gsearch:one_page" do |tag|
+    tag.expand if gsearch.response_data.cursor.pages.count == 1
+  end
+  
+  desc 'Renders its contents when there is more than a single page'
+  tag "gsearch:pages" do |tag|
+    tag.expand if gsearch.response_data.cursor.pages.count > 1
+  end
+  
+  desc 'Sets the context for each of the pages in the result set'
+  tag "gsearch:pages:each" do |tag|
+    output = ""
+    gsearch.response_data.cursor.pages.each do |page| 
+      tag.locals.gpage = page
+      output << tag.expand
+    end
+    output
+  end
+  
+  desc 'Renders the search page number'
+  tag "gsearch:pages:title" do |tag|
+    tag.locals.gpage.label
+  end
+  desc 'Renders the search page path'
+  tag "gsearch:pages:url" do |tag|
+    "#{url}?q=#{CGI.escapeHTML(query)}&amp;start=#{tag.locals.gpage.start}"
+  end
 
   
   def query
