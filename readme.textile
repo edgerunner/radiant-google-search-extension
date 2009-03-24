@@ -1,0 +1,32 @@
+h1. Radiant *Google Search* Extension
+
+This is an extension for "Radiant CMS":http://radiantcms.org that uses the "Google REST Search API(Application Programming Interface)":http://code.google.com/apis/ajaxsearch/documentation/reference.html#_intro_fonje to obtain search results from google and display them in Radiant.
+
+h2. Installation
+
+After installing the extension in @your-radiant-site/vendor/extensions/google_search@ , run @rake radiant:extensions:google_search:migrate@ . This will write two blank settings, @google_search.api_key@ and @google_search.custom_search_id@ into Radiant::Config table. 
+
+Then *you must get* an "API key from Google":code.google.com/apis/ajaxsearch/signup.html in order to get the extension to work, and you probably will want to make a "Google Custom Search Engine":http://www.google.com/coop/cse/ and use it to restrict searches to your own site, otherwise the API will return search results from the whole web.
+
+Either set the configuration keys in your @environment.rb@ file or better yet, install the "Settings extension":http://github.com/Squeegy/radiant-settings. Remember, you need the API key!
+
+h2. Usage
+
+The extension uses a special page type called *Google Search* to display the search results. This page type has special Radius tags beginning with @gsearch@ to display the search results. You must create a page of this type to start using the extension and build your search results page using the provided tags. Refer to the embedded documentation for tag descriptions.
+
+There is also a tag available to all pages called @gsearch:form@ that renders a simple search form.
+
+h2. Development Status
+
+The *Google Search Extension* is very new and may turn out to have many bugs and bottlenecks. Any improvement is most definitely welcome. 
+
+h3. To-Do's
+
+* Strip result url's of the site domain and return local paths when appropriate.
+* Implement specs to ensure everything keeps working as intended
+* Better tag documentation with examples
+* Ability to use the Google Image Search API
+
+h3. Contributors
+
+* "Mert Torun":http://merttorun.com
