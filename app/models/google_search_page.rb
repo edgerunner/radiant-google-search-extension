@@ -26,7 +26,7 @@ class GoogleSearchPage < Page
   
   desc 'Renders its contents when there are results'
   tag 'gsearch:results' do |tag|
-    tag.expand if results and results.count > 0
+    tag.expand if results and results.length > 0
   end
   
   desc 'Renders the estimated result count. You may set the @one@ and @many@ attributes to specify the output. use a single # where you want the number to appear'
@@ -77,7 +77,7 @@ class GoogleSearchPage < Page
   desc 'Sets the context to the next page'
   tag "gsearch:pages:next" do |tag|
     page_index = cursor.current_page_index.to_i + 1
-    page_index = pages.count if page_index > pages.count
+    page_index = pages.length if page_index > pages.length
     tag.locals.gpage = pages[page_index]
     tag.expand
   end
@@ -104,12 +104,12 @@ class GoogleSearchPage < Page
   
   desc 'Renders its contents when there is only a single page'
   tag "gsearch:one_page" do |tag|
-    tag.expand if pages and pages.count == 1
+    tag.expand if pages and pages.length == 1
   end
   
   desc 'Renders its contents when there is more than a single page'
   tag "gsearch:pages" do |tag|
-    tag.expand if pages and pages.count > 1
+    tag.expand if pages and pages.length > 1
   end
   
   desc 'Sets the context for each of the pages in the result set'
