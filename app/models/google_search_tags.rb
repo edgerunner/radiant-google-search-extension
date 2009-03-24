@@ -1,6 +1,5 @@
 module GoogleSearchTags
   include Radiant::Taggable
-  include ActionView::Helpers::FormTagHelper
   
   desc 'The namespace for all Google search tags'
   tag 'gsearch' do |tag|
