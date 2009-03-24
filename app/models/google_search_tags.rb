@@ -6,7 +6,7 @@ module GoogleSearchTags
     tag.expand
   end
   
-  desc 'Renders a search form. Targets the first Google Search page in the database by default or the given @url@ attribute.'
+  desc 'Renders a search form. Targets the first Google Search page in the database by default or the given @url@ attribute. Use the @submit@ attribute to specify the text on  the submit button. All other attributes are passed to the form tag.'
   tag 'gsearch:form' do |tag|
     form_url = tag.attr.delete('url') || GoogleSearchPage.first.url
     submit_label = tag.attr.delete('submit') || 'Search' 

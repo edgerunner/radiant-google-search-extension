@@ -29,11 +29,9 @@ class GoogleSearchPage < Page
     tag.expand if results and results.count > 0
   end
   
-  desc 'Renders the estimated result count. You may set the @zero@, @one@ and @many@ attributes to specify the output. use a single # where you want the number to appear'
+  desc 'Renders the estimated result count. You may set the @one@ and @many@ attributes to specify the output. use a single # where you want the number to appear'
   tag 'gsearch:results:count' do |tag|
     case cursor.estimated_result_count.to_i
-    when 0
-      output = tag.attr['zero'] || '#'
     when 1
       output = tag.attr['one']  || '#'
     else
@@ -52,12 +50,22 @@ class GoogleSearchPage < Page
     output
   end
   
-  %w[title_no_formatting content visible_url url title unescaped_url cache_url].each do |sym|
-    desc "Renders the <strong>#{sym.humanize}</strong> of the current result"
+  %w[title_no_formatting content visible_url title cache_url].each do |sym|
+    desc "Renders the *#{sym.humanize}* for the current result"
     tag "gsearch:results:each:#{sym}" do |tag|
       tag.locals.result.send sym
     end
   end 
+  
+  desc "Renders the *escaped url* for the current result"
+  tag "gsearch:results:each:escaped_url" do |tag|
+    tag.locals.result.url
+  end
+  
+  desc "Renders the *url* for the current result"
+  tag "gsearch:results:each:url" do |tag|
+    tag.locals.result.unescaped_url
+  end
   
   desc 'Sets the context to the current page'
   tag "gsearch:pages:current" do |tag|
