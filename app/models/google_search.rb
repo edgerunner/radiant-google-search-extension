@@ -1,7 +1,7 @@
 class GoogleSearch < ActiveResource::Base
   self.site = "http://ajax.googleapis.com/ajax/services/search/web"
   self.format = ActiveResource::Formats[:json]
-  attr_reader :query, :start
+  attr_reader :query, :start, :response_data, :response_status, :response_details
   
   def initialize(q,s=0)
     @query, @start = q, s

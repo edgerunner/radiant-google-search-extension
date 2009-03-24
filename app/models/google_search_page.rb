@@ -14,30 +14,38 @@ class GoogleSearchPage < Page
   
   desc 'Renders the error message when there is one'
   tag 'gsearch:error' do |tag|
-    unless gsearch.response_status == 200
+    if gsearch and (gsearch.response_status != 200)
       "#{gsearch.response_status}: #{gsearch.response_details}"
     end
   end
   
   desc 'Renders its contents when there are no results'
-  tag 'gsearch:no-results' do |tag|
-    tag.expand unless query and gsearch.response_data.results.count.zero?
+  tag 'gsearch:no_results' do |tag|
+    tag.expand if (query and results and results.empty?)
   end
   
   desc 'Renders its contents when there are results'
   tag 'gsearch:results' do |tag|
-    tag.expand if gsearch and gsearch.response_data.results.count > 0
+    tag.expand if results and results.count > 0
   end
   
-  desc 'Renders the estimated result count'
+  desc 'Renders the estimated result count. You may set the @zero@, @one@ and @many@ attributes to specify the output. use a single # where you want the number to appear'
   tag 'gsearch:results:count' do |tag|
-    gsearch.response_data.cursor.estimated_result_count
+    case cursor.estimated_result_count.to_i
+    when 0
+      output = tag.attr['zero'] || '#'
+    when 1
+      output = tag.attr['one']  || '#'
+    else
+      output = tag.attr['many'] || '#'
+    end
+    output.sub '#', cursor.estimated_result_count
   end
   
   desc 'Sets the context for each result in the set'
   tag 'gsearch:results:each' do |tag|
     output = ""
-    gsearch.response_data.results.each do |result|
+    results.each do |result|
       tag.locals.result = result
       output << tag.expand
     end
@@ -49,57 +57,57 @@ class GoogleSearchPage < Page
     tag "gsearch:results:each:#{sym}" do |tag|
       tag.locals.result.send sym
     end
-  end
+  end 
   
   desc 'Sets the context to the current page'
   tag "gsearch:pages:current" do |tag|
-    page_index = gsearch.response_data.cursor.current_page_index.to_i
-    tag.locals.gpage = gsearch.response_data.cursor.pages[page_index]
+    page_index = cursor.current_page_index.to_i
+    tag.locals.gpage = pages[page_index]
     tag.expand
   end
   
   desc 'Sets the context to the next page'
   tag "gsearch:pages:next" do |tag|
-    page_index = gsearch.response_data.cursor.current_page_index.to_i + 1
-    page_index = gsearch.response_data.cursor.pages.count if page_index > gsearch.response_data.cursor.pages.count
-    tag.locals.gpage = gsearch.response_data.cursor.pages[page_index]
+    page_index = cursor.current_page_index.to_i + 1
+    page_index = pages.count if page_index > pages.count
+    tag.locals.gpage = pages[page_index]
     tag.expand
   end
   
   desc 'Sets the context to the previous page'
   tag "gsearch:pages:prev" do |tag|
-    page_index = gsearch.response_data.cursor.current_page_index.to_i - 1
+    page_index = cursor.current_page_index.to_i - 1
     page_index = 0 if page_index < 0
-    tag.locals.gpage = gsearch.response_data.cursor.pages[page_index]
+    tag.locals.gpage = pages[page_index]
     tag.expand
   end
   
   desc 'Sets the context to the first page'
   tag "gsearch:pages:first" do |tag|
-    tag.locals.gpage = gsearch.response_data.cursor.pages.first
+    tag.locals.gpage = pages.first
     tag.expand
   end
   
   desc 'Sets the context to the last page'
   tag "gsearch:pages:last" do |tag|
-    tag.locals.gpage = gsearch.response_data.cursor.pages.last
+    tag.locals.gpage = pages.last
     tag.expand
   end
   
   desc 'Renders its contents when there is only a single page'
   tag "gsearch:one_page" do |tag|
-    tag.expand if gsearch.response_data.cursor.pages.count == 1
+    tag.expand if pages and pages.count == 1
   end
   
   desc 'Renders its contents when there is more than a single page'
   tag "gsearch:pages" do |tag|
-    tag.expand if gsearch.response_data.cursor.pages.count > 1
+    tag.expand if pages and pages.count > 1
   end
   
   desc 'Sets the context for each of the pages in the result set'
   tag "gsearch:pages:each" do |tag|
     output = ""
-    gsearch.response_data.cursor.pages.each do |page| 
+    pages.each do |page| 
       tag.locals.gpage = page
       output << tag.expand
     end
@@ -127,7 +135,22 @@ class GoogleSearchPage < Page
     return unless query
     @gsearch ||= GoogleSearch.new query, start
   end
- 
+  def results
+    gsearch.response_data.results
+  rescue NoMethodError
+    nil
+  end
+  def cursor
+    gsearch.response_data.cursor
+  rescue NoMethodError
+    nil
+  end
+  def pages
+    gsearch.response_data.cursor.pages
+  rescue NoMethodError
+    nil
+  end
+  
   def cache?
     false
   end
